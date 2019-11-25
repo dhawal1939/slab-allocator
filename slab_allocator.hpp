@@ -38,4 +38,21 @@ struct slab_s{
    kmem_bufctl_t free_adr;
 };
 
+/*
+* kmem_caches implemented
+* 4, 8, 16,32,64,128,256,512,1K, 2k,4k(max-page size)
+*
+* cache coloring - to be calculated on the go //do not include this function 
+* in header as its a helper function
+* 
+* object1-slab-array-1 starts at 0, object1-slab-array-2 starts at L1_CACHE_LINE_SIZE
+*
+* calculate nearest 2 power function
+* if the nearest 2 power goes higher than 4K allocate using kmalloc (preferable malloc need to discuss)
+*
+* think of shink routine which deallocates pages if the total count is way less than a page size
+*
+* 
+*/
+
 #endif //!SLAB_ALLOCATOR_H_
