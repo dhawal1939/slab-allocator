@@ -15,10 +15,10 @@ typedef struct kmem_cache_s{
 	slab_s* partial_lst;
 	slab_s* full_lst;
 
-	uint obj_size;
-	uint num_obj_slab;
-	uint total_num_obj;
-	uint num_blocks_slab;
+	uint32_t obj_size;
+	uint32_t num_obj_slab;
+	uint32_t total_num_obj;
+	uint32_t num_blocks_slab;
 
 	void(*ctor)(void*);
 	void(*dtor)(void*);
