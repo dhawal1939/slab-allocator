@@ -1,6 +1,6 @@
 #ifndef SLAB_ALLOCATOR_H_
 #define SLAB_ALLOCATOR_H_
-
+#define slab_bufctl(slabp) \((kmem_bufctl_t *)(((slab_t*)slabp)+1))
 
 #include <stdint.h>
 #include <stdio.h>
@@ -28,5 +28,14 @@ typedef struct kmem_cache_s{
 
 
 }kmem_cache_t;
+
+typedef unsigned int kmem_bufctl_t;
+
+struct slab_s{
+   slab_s* list_type;
+   void* start_adr;
+   unsigned int num_active;
+   kmem_bufctl_t free_adr;
+};
 
 #endif //!SLAB_ALLOCATOR_H_
