@@ -1,0 +1,5 @@
+/home/jondoe/os-project/slab-allocator/build/CMakeFiles/rebuild_cache.dir
+/home/jondoe/os-project/slab-allocator/build/CMakeFiles/edit_cache.dir
+/home/jondoe/os-project/slab-allocator/build/src/CMakeFiles/rebuild_cache.dir
+/home/jondoe/os-project/slab-allocator/build/src/CMakeFiles/slab_allocator.dir
+/home/jondoe/os-project/slab-allocator/build/src/CMakeFiles/edit_cache.dir

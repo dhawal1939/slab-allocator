@@ -1,0 +1,1 @@
+/usr/bin/c++    -rdynamic CMakeFiles/slab_allocator.dir/main.o  -o slab_allocator 
