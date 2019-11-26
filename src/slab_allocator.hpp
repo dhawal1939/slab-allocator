@@ -2,9 +2,8 @@
 #define SLAB_ALLOCATOR_H_
 #define slab_bufctl(slabp) \((kmem_bufctl_t *)(((slab_t*)slabp)+1))
 
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include "header.hpp"
+#include "create_memory.hpp"
 
 typedef struct slab_s;
 
@@ -25,18 +24,17 @@ typedef struct kmem_cache_s{
 
 	kmem_cache_s* next;
 	kmem_cache_s* prev;
-
-
 }kmem_cache_t;
 
-typedef unsigned int kmem_bufctl_t;
+typedef uint32_t kmem_bufctl_t;
 
 struct slab_s{
    slab_s* list_type;
-   void* start_adr;
-   unsigned int num_active;
+   void* start_adrr;
+   uint32_t num_active;
    kmem_bufctl_t free_adr;
 };
+
 
 /*
 * kmem_caches implemented
