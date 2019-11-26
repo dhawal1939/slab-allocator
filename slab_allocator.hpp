@@ -52,7 +52,14 @@ struct slab_s{
 *
 * think of shink routine which deallocates pages if the total count is way less than a page size
 *
-* 
+* need to implement a mini slabinfo to get summary of the memory
+*
+* sub task - cmake
+*
+* boundaries of one object slab can access other objects -- need to think about it as memory is contiguous and 
+* all objects are being made by single process and single pid(all memory is obtained at start and the memorys is assumed to be contiguous
+* hence this discrepency) think of allocating pages on request when asked rather than creating whole memory before hand
+*
 */
 
 #endif //!SLAB_ALLOCATOR_H_
