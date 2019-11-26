@@ -34,15 +34,19 @@ struct slab_s{
    uint32_t num_active;
    kmem_bufctl_t free_adr;
 };
-
-
+kmem_cache_t* kmem_cache_create(char*, int, void(*)(void*,int), void(*)(void*,int));
+void* kmem_cache_alloc(kmem_cache_t*);
+int kmem_cache_reap(int);
+int kmem_cache_shrink(kmem_cache_t*);
+void* kmem_cache_free(kmem_cache_t*, void*);
+int kmem_cache_destroy(kmem_cache_t*);
 /*
 * kmem_caches implemented
 * 4, 8, 16,32,64,128,256,512,1K, 2k,4k(max-page size)
 *
-* cache coloring - to be calculated on the go //do not include this function 
+* cache coloring - to be calculated on the go //do not include this function
 * in header as its a helper function
-* 
+*
 * object1-slab-array-1 starts at 0, object1-slab-array-2 starts at L1_CACHE_LINE_SIZE
 *
 * calculate nearest 2 power function
@@ -54,7 +58,7 @@ struct slab_s{
 *
 * sub task - cmake
 *
-* boundaries of one object slab can access other objects -- need to think about it as memory is contiguous and 
+* boundaries of one object slab can access other objects -- need to think about it as memory is contiguous and
 * all objects are being made by single process and single pid(all memory is obtained at start and the memorys is assumed to be contiguous
 * hence this discrepency) think of allocating pages on request when asked rather than creating whole memory before hand
 *
