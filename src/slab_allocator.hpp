@@ -14,10 +14,10 @@ typedef struct kmem_cache_s{
 	slab_s* partial_lst;
 	slab_s* full_lst;
 
-	uint32_t obj_size;
-	uint32_t num_obj_slab;
-	uint32_t total_num_obj;
-	uint32_t num_blocks_slab;
+	uint64_t obj_size;
+	uint64_t num_obj_slab;
+	uint64_t total_num_obj;
+	uint64_t num_blocks_slab;
 
 	void(*ctor)(void*);
 	void(*dtor)(void*);
@@ -26,20 +26,39 @@ typedef struct kmem_cache_s{
 	kmem_cache_s* prev;
 }kmem_cache_t;
 
-typedef uint32_t kmem_bufctl_t;
+typedef uint64_t kmem_bufctl_t;
 
 struct slab_s{
    slab_s* list_type;
    void* start_adrr;
-   uint32_t num_active;
+   uint64_t num_active;
+   uint64_t max_objects;
    kmem_bufctl_t free_adr;
+   uint64_t bufctl[16];
 };
-kmem_cache_t* kmem_cache_create(char*, int, void(*)(void*,int), void(*)(void*,int));
+
+struct cache_size_s
+{
+	uint64_t cache_size;
+	kmem_cache_s *cachep;
+};
+
+kmem_cache_t* kmem_cache_create(char*, int64_t, void(*)(void*,int64_t), void(*)(void*,int64_t));
+
 void* kmem_cache_alloc(kmem_cache_t*);
-int kmem_cache_reap(int);
-int kmem_cache_shrink(kmem_cache_t*);
+
+int64_t kmem_cache_reap(int64_t);
+
+int64_t kmem_cache_shrink(kmem_cache_t*);
+
 void* kmem_cache_free(kmem_cache_t*, void*);
-int kmem_cache_destroy(kmem_cache_t*);
+
+int64_t kmem_cache_destroy(kmem_cache_t*);
+
+void *kmalloc(uint64_t size);
+
+uint64_t kmem_cache_estimate(uint64_t slab_size);
+
 /*
 * kmem_caches implemented
 * 4, 8, 16,32,64,128,256,512,1K, 2k,4k(max-page size)
