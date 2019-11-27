@@ -58,7 +58,7 @@ int64_t kmem_cache_destroy(kmem_cache_t*);
 void *kmalloc(uint64_t size);
 
 uint64_t kmem_cache_estimate(uint64_t slab_size);
-
+//invalid data
 /*
 * kmem_caches implemented
 * 4, 8, 16,32,64,128,256,512,1K, 2k,4k(max-page size)
