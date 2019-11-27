@@ -8,7 +8,7 @@
 typedef struct slab_s;
 
 typedef struct kmem_cache_s{
-	const char* name;
+	char name[20];
 
 	slab_s* free_lst;
 	slab_s* partial_lst;
@@ -18,6 +18,7 @@ typedef struct kmem_cache_s{
 	int64_t num_obj_slab;
 	int64_t total_num_obj;
 	int64_t ref_count;
+	int64_t active_objs;
 	int64_t num_blocks_slab;
 	
 	int64_t color;
@@ -51,7 +52,7 @@ struct cache_size_s
 
 int64_t base_address;
 
-kmem_cache_t* kmem_cache_create(char*, int64_t, void(*)(void*,int64_t), void(*)(void*,int64_t));
+void kmem_cache_create(void *);
 
 void* kmem_cache_alloc(kmem_cache_t*);
 
