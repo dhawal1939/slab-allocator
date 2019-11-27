@@ -17,19 +17,25 @@ typedef struct kmem_cache_s{
 	int64_t obj_size;
 	int64_t num_obj_slab;
 	int64_t total_num_obj;
+	int64_t ref_count;
 	int64_t num_blocks_slab;
+	
+	int64_t color;
+	int64_t color_off;
+	int64_t color_next;
 
 	void(*ctor)(void*);
 	void(*dtor)(void*);
 
 	kmem_cache_s* next;
 	kmem_cache_s* prev;
+
 }kmem_cache_t;
 
 typedef int64_t kmem_bufctl_t;
 
 struct slab_s{
-   slab_s* list_type;
+   slab_s* slab_type;
    void* start_adrr;
    int64_t num_active;
    int64_t max_objects;
@@ -42,6 +48,8 @@ struct cache_size_s
 	int64_t cache_size;
 	kmem_cache_s *cachep;
 };
+
+int64_t base_address;
 
 kmem_cache_t* kmem_cache_create(char*, int64_t, void(*)(void*,int64_t), void(*)(void*,int64_t));
 
@@ -57,8 +65,7 @@ int64_t kmem_cache_destroy(kmem_cache_t*);
 
 void *kmalloc(int64_t size);
 
-int64_t kmem_cache_estimate(int64_t slab_size);
-//invalid data
+int64_t kmem_cache_estimate(uint64_t slab_size);
 /*
 * kmem_caches implemented
 * 4, 8, 16,32,64,128,256,512,1K, 2k,4k(max-page size)
