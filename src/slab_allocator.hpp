@@ -14,10 +14,10 @@ typedef struct kmem_cache_s{
 	slab_s* partial_lst;
 	slab_s* full_lst;
 
-	uint64_t obj_size;
-	uint64_t num_obj_slab;
-	uint64_t total_num_obj;
-	uint64_t num_blocks_slab;
+	int64_t obj_size;
+	int64_t num_obj_slab;
+	int64_t total_num_obj;
+	int64_t num_blocks_slab;
 
 	void(*ctor)(void*);
 	void(*dtor)(void*);
@@ -26,20 +26,20 @@ typedef struct kmem_cache_s{
 	kmem_cache_s* prev;
 }kmem_cache_t;
 
-typedef uint64_t kmem_bufctl_t;
+typedef int64_t kmem_bufctl_t;
 
 struct slab_s{
    slab_s* list_type;
    void* start_adrr;
-   uint64_t num_active;
-   uint64_t max_objects;
+   int64_t num_active;
+   int64_t max_objects;
    kmem_bufctl_t free_adr;
-   uint64_t bufctl[16];
+   int64_t bufctl[16];
 };
 
 struct cache_size_s
 {
-	uint64_t cache_size;
+	int64_t cache_size;
 	kmem_cache_s *cachep;
 };
 
@@ -55,9 +55,9 @@ void* kmem_cache_free(kmem_cache_t*, void*);
 
 int64_t kmem_cache_destroy(kmem_cache_t*);
 
-void *kmalloc(uint64_t size);
+void *kmalloc(int64_t size);
 
-uint64_t kmem_cache_estimate(uint64_t slab_size);
+int64_t kmem_cache_estimate(int64_t slab_size);
 //invalid data
 /*
 * kmem_caches implemented
