@@ -3,12 +3,15 @@
 
 #include "header.hpp"
 
-void* create_memory(int32_t size);
+void* memory;
+int64_t *page_info;
+
+void* create_memory(int64_t size);
 
 
-void* get_page(uint32_t *page_info);
+void* get_page();
 
 
-void* free_page(uint32_t *page_info, void * memory);
+void* free_page();
 
 #endif //!CREATE_MEMORT_HPP_

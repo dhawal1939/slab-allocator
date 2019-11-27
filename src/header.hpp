@@ -10,4 +10,7 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 
+#define PAGE_SIZE 4096
+#define CACHE_LINE 64
+
 #endif //!HEADER_HPP
