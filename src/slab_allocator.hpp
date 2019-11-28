@@ -14,9 +14,10 @@ typedef struct slab_s;
 
 unordered_map<void*, void*> slab_to_cache_address;
 
-typedef struct kmem_cache_s{
+typedef struct kmem_cache_s
+{
 	char name[20];
-// need to think about memory alloc
+
 	void* free_lst;
 	void* partial_lst;
 	void* full_lst;
@@ -25,6 +26,7 @@ typedef struct kmem_cache_s{
 	int64_t max_objs_per_slab;
 	int64_t ref_count;
 	int64_t active_objs;
+
 	int64_t num_of_slabs;
 	
 	int64_t color;
@@ -43,11 +45,15 @@ typedef uint64_t kmem_bufctl_t;
 
 struct slab_s{
    int64_t slab_type;
+
    void* start_adrr;
+
    int64_t num_active;
    int64_t max_objects;
+
    kmem_bufctl_t free_adr;
    uint64_t bufctl[16];
+
 };
 
 struct cache_size_s
@@ -74,7 +80,8 @@ int64_t kmem_cache_destroy(kmem_cache_t*);
 
 void *kmalloc(int64_t size);
 
-int64_t kmem_cache_estimate(uint64_t slab_size);
+void kfree(void *addr);
+
 /*
 * kmem_caches implemented
 * 4, 8, 16,32,64,128,256,512,1K, 2k,4k(max-page size)

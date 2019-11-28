@@ -86,8 +86,6 @@ void kmem_init(void* basememory)
 
 void kmem_cache_grow(kmem_cache_t *cachep)
 {
-
-    //hash needs to be made so as to use it at delete
     if(cachep)
     {
         void *new_slab = get_page();
@@ -103,8 +101,46 @@ void kmem_cache_grow(kmem_cache_t *cachep)
 
         slab_data->free_adr = 0;
 
+       //hash needs to be made so as to use it at delete
         slab_to_cache_address[new_slab] = cachep;
+    
         ((list<slab_s*>*)cachep->free_lst)->push_back(slab_data);        
     }
     return;
+}
+
+kmem_cache_t* kmem_cache_estimate(int64_t size)
+{
+    kmem_cache_t *cache_ptr = NULL;
+    
+    if(base_address)
+    {
+        int64_t index = ceil(log2(size));
+        cache_ptr = (((kmem_cache_t*)base_address) + (index - 2));
+    }
+
+    return cache_ptr;
+}
+
+void *kmalloc(int64_t size)
+{
+    void *allocated = NULL;
+    if(base_address)
+    {
+        kmem_cache_t* cachep = kmem_cache_estimate(size);
+        
+        list<slab_s*>  *partialist, *freelist, *fulllist;
+        
+        partialist = ((list<slab_s*>*)(cachep->partial_lst));
+        fulllist = ((list<slab_s*>*)(cachep->full_lst));
+        freelist = ((list<slab_s*>*)(cachep->free_lst));
+
+        //depends of buffctl
+        
+    }
+    else
+    {
+        printf("NO MEMORY ALLOCATED\n");
+    }
+    return allocated;
 }
