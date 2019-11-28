@@ -7,12 +7,18 @@
 
 typedef struct slab_s;
 
+#define FULL 1
+#define FREE 2
+#define PARTIAL 3
+
+unordered_map<void*, void*> slab_to_cache_address;
+
 typedef struct kmem_cache_s{
 	char name[20];
 
-	slab_s* free_lst;
-	slab_s* partial_lst;
-	slab_s* full_lst;
+	list<slab_s*> free_lst;
+	list<slab_s*> partial_lst;
+	list<slab_s*> full_lst;
 
 	int64_t obj_size;
 	int64_t num_obj_slab;
@@ -36,7 +42,7 @@ typedef struct kmem_cache_s{
 typedef int64_t kmem_bufctl_t;
 
 struct slab_s{
-   slab_s* slab_type;
+   int64_t slab_type;
    void* start_adrr;
    int64_t num_active;
    int64_t max_objects;
@@ -54,9 +60,11 @@ int64_t base_address;
 
 void kmem_cache_create(void *);
 
-void* kmem_cache_alloc(kmem_cache_t*);
+void kmem_cache_alloc(kmem_cache_t*);
 
 int64_t kmem_cache_reap(int64_t);
+
+void kmem_cache_grow(kmem_cache_t*);
 
 int64_t kmem_cache_shrink(kmem_cache_t*);
 
