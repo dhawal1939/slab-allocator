@@ -39,7 +39,7 @@ typedef struct kmem_cache_s{
 
 }kmem_cache_t;
 
-typedef int64_t kmem_bufctl_t;
+typedef uint64_t kmem_bufctl_t;
 
 struct slab_s{
    int64_t slab_type;
@@ -47,7 +47,7 @@ struct slab_s{
    int64_t num_active;
    int64_t max_objects;
    kmem_bufctl_t free_adr;
-   int64_t bufctl[16];
+   uint64_t bufctl[16];
 };
 
 struct cache_size_s
@@ -56,7 +56,7 @@ struct cache_size_s
 	kmem_cache_s *cachep;
 };
 
-int64_t base_address;
+void* base_address;
 
 void kmem_cache_create(void *);
 
