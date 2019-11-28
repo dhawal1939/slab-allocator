@@ -128,6 +128,8 @@ void *kmalloc(int64_t size)
     if(base_address)
     {
         kmem_cache_t* cachep = kmem_cache_estimate(size);
+
+        int64_t obj_size = cachep->obj_size;
         
         list<slab_s*>  *partialist, *freelist, *fulllist;
         
@@ -135,8 +137,19 @@ void *kmalloc(int64_t size)
         fulllist = ((list<slab_s*>*)(cachep->full_lst));
         freelist = ((list<slab_s*>*)(cachep->free_lst));
 
-        //depends of buffctl
-        
+        slab_s* free_slab = NULL;
+        int index = 0;
+        // depends of buffctl
+        // we the index the bufctl calculate address
+        // update the slab from freelist fulllist
+        // index = get from bufctl
+        {
+            free_slab->num_active++;
+            //update the partial based on the number of active objects and max count
+            free_slab->slab_type = PARTIAL;
+            free_slab->free_adr //not using think about
+            allocated = (free_slab->start_adrr + index * obj_size);
+        }
     }
     else
     {
