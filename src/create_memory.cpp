@@ -22,6 +22,7 @@ void * get_page()
         empty_page++;
         traverse++;
     }
+    page_info[empty_page] = 1;
     return memory+PAGE_SIZE*empty_page;
 }
 

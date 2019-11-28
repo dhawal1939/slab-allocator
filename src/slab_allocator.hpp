@@ -10,22 +10,22 @@ typedef struct slab_s;
 #define FULL 1
 #define FREE 2
 #define PARTIAL 3
+#define MAX_SLAB_SIZE 200
 
 unordered_map<void*, void*> slab_to_cache_address;
 
 typedef struct kmem_cache_s{
 	char name[20];
-
-	list<slab_s*> free_lst;
-	list<slab_s*> partial_lst;
-	list<slab_s*> full_lst;
+// need to think about memory alloc
+	void* free_lst;
+	void* partial_lst;
+	void* full_lst;
 
 	int64_t obj_size;
-	int64_t num_obj_slab;
-	int64_t total_num_obj;
+	int64_t max_objs_per_slab;
 	int64_t ref_count;
 	int64_t active_objs;
-	int64_t num_blocks_slab;
+	int64_t num_of_slabs;
 	
 	int64_t color;
 	int64_t color_off;
