@@ -53,7 +53,7 @@ struct slab_s{
    int64_t max_objects;
 
    kmem_bufctl_t free_adr;
-   uint64_t bufctl[16];
+   uint64_t bufctl[8];
 };
 
 struct cache_size_s

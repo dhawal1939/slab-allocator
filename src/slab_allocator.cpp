@@ -9,29 +9,30 @@ void bufctl_init(uint64_t* bufctl)
 
 uint64_t bufctl_first_free(uint64_t *buffctl, uint64_t max_objects)
 {
-	int64_t i=15;
+	int64_t i=7;
     	
 	while(~buffctl[i] == 0)i--;
     
-    i = BITS - log2(~buffctl[i]) + (15 - i) * BITS + 1;
+    i = BITS - log2(~buffctl[i]) + (7 - i) * BITS + 1;
 
 	return (i <= max_objects) ? i : -1; 
 }
 
 void bufctl_set(uint64_t *buffctl,uint64_t index)
 {
-	int64_t i=16*BITS-index;
-
-	buffctl[i/BITS]|=(1<<(i%BITS));
+	int64_t i=8*BITS-index;
+	uint64_t shift = 1;
+	buffctl[i/BITS]|=(shift<<(i%BITS));
 }
 
 void bufctl_clear(uint64_t *buffctl,uint64_t index)
 {
 	// coming from MSB
-	int64_t i = 16* BITS - index;
+	int64_t i = 8* BITS - index;
 
+	uint64_t shift = 1;
 	// array index and bit position
-	buffctl[(i/BITS)] &= (~(1<<(i%BITS)));                    
+	buffctl[(i/BITS)] &= (~(shift<<(i%BITS)));
 }
 
 void kmem_cache_create(void *memory)
@@ -42,7 +43,7 @@ void kmem_cache_create(void *memory)
     {
         kmem_cs[i].obj_size = pow(2,i+3);
 
-        sprintf(kmem_cs[i].name, "%s-%ld", "size", kmem_cs[i].obj_size);
+        sprintf(kmem_cs[i].name, "%s-%ld", "kmem_cache_size", kmem_cs[i].obj_size);
         
         kmem_cs[i].ctor = kmem_cs[i].dtor = NULL;
        
@@ -208,7 +209,11 @@ void* kmem_cache_alloc(kmem_cache_t *cachep)
 
         slab_s* free_partial_slab = NULL;
 
-        if(partialist->size()==0 && freelist->size()==0)
+        if(partialist->size() != 0)
+        {
+        	free_partial_slab = *(partialist->begin());
+        }
+        else if(partialist->size()==0 && freelist->size()==0)
         {
             kmem_cache_grow(cachep);
             free_partial_slab = *(freelist->begin());
@@ -218,9 +223,13 @@ void* kmem_cache_alloc(kmem_cache_t *cachep)
             partialist->insert(free_partial_slab);
 
         }
-        else if(partialist->size() != 0)
+        else if(freelist->size() != 0)
         {
-            free_partial_slab = *(partialist->begin());
+        	free_partial_slab = *(freelist->begin());
+        	freelist->erase(free_partial_slab);
+
+        	free_partial_slab->slab_type = PARTIAL;
+        	partialist->insert(free_partial_slab);
         }
 
         // first free object based on bufctl bitvector
@@ -260,6 +269,7 @@ void * kmalloc(int64_t size)
     if(base_address)
     {
         kmem_cache_t* cachep = kmem_cache_estimate(size);
+        cachep->active_objs = ++cachep->ref_count;
 
         allocated = kmem_cache_alloc(cachep);
     }
@@ -350,16 +360,20 @@ void slab_info()
 {
     kmem_cache_t* cachep = (kmem_cache_t*)base_address;
 
-    printf("NAME\t\tOBJ_SIZE\t\tMAX_OBJ_SLAB\t\tREF_COUNT\t\tNUM_OF_SLABS\t\tFREE_LIST SIZE\t\tPARTIAL_LIST SIZE\t\tPARTIAL_LIST SIZE\n\n");
-    for(int i = 0; i < NO_OF_CACHES + 1; i++)
+    char* pad = (char*)calloc(sizeof(char), 10);
+    printf("NAME\t\tOBJ_SIZE\t\tMAX_OBJ_SLAB\t\tREF_COUNT\t\tNUM_OF_SLABS\t\tFREE_LIST SIZE\t\FULL_LIST SIZE\t\tPARTIAL_LIST SIZE\n\n");
+    for(int i = 0; i < NO_OF_CACHES; i++)
     {
-        printf("%s\t", cachep[i].name);
-        printf("%ld\t", cachep[i].obj_size);
-        printf("%ld\t", cachep[i].max_objs_per_slab);
-        printf("%ld\t", cachep[i].ref_count);
-        printf("%ld\t", cachep[i].num_of_slabs);
-        printf("%ld\t", ((slab_list*)(cachep[i].free_lst))->size());
-        printf("%ld\t", ((slab_list*)(cachep[i].full_lst))->size());
+    	if(strlen(cachep[i].name)<=7)
+    		printf("%s\t\t\t", cachep[i].name);
+    	else
+    		printf("%s\t\t", cachep[i].name);
+        printf("%ld\t\t", cachep[i].obj_size);
+        printf("%ld\t\t", cachep[i].max_objs_per_slab);
+        printf("%ld\t\t", cachep[i].ref_count);
+        printf("%ld\t\t", cachep[i].num_of_slabs);
+        printf("%ld\t\t", ((slab_list*)(cachep[i].free_lst))->size());
+        printf("%ld\t\t", ((slab_list*)(cachep[i].full_lst))->size());
         printf("%ld\n", ((slab_list*)(cachep[i].partial_lst))->size());
     }
     return;
