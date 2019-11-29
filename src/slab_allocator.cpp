@@ -1,5 +1,5 @@
 #include "slab_allocator.hpp"
-unordered_map<void*, void*> slab_to_cache_address;
+unordered_map<int64_t , void*> slab_to_cache_address;
 void * base_address = NULL;
 void bufctl_init(uint64_t* bufctl)
 {
@@ -85,6 +85,8 @@ void* kmem_init_helper(){
     
     cache_cache->ctor = cache_cache->dtor = NULL;
 
+    cache_cache->obj_size = sizeof(cache_size_s);
+
     cache_cache->max_objs_per_slab = NO_OF_CACHES;
     
     cache_cache->next = cache_cache->prev = NULL;
@@ -168,7 +170,7 @@ void kmem_cache_grow(kmem_cache_t *cachep)
         bufctl_init(slab_data->bufctl);
 
         // hash needs to be made so as to use it at delete
-        slab_to_cache_address[new_slab] = cachep;
+        slab_to_cache_address[(int64_t)new_slab] = cachep;
     
         ((slab_list*)cachep->free_lst)->insert(slab_data);        
     }
@@ -341,19 +343,24 @@ void kfree(void* obj){
         printf("NULL MEMORY PASSED\n");
         return;
     }
-    void *rel_slabaddr=NULL;
+    //void *rel_slabaddr=NULL;
     void *slab_base=NULL;
 
-    int64_t addr = (int64_t)obj;
-    rel_slabaddr = (void *)((addr >>12)<<12);
+    int64_t addr =  ((int64_t)obj - (int64_t)base_address)/PAGE_SIZE;
 
-    slab_base = base_address +(long)rel_slabaddr ;
+    slab_base = base_address + PAGE_SIZE*addr;
     
-    void *cachep=NULL;
+    for(auto i = slab_to_cache_address.begin(); i != slab_to_cache_address.end(); i++)
+    	printf("%ld->%ld\n", i->first, i->second);
+
+    kmem_cache_t *cachep=NULL;
+
+    printf("%ld\n", slab_base);
+
     // taking absolute address as key
-    cachep = slab_to_cache_address[slab_base];
+    cachep = (kmem_cache_t*)slab_to_cache_address[(int64_t)slab_base];
    
-    kmem_cache_free((kmem_cache_t*)cachep, obj, slab_base);
+    kmem_cache_free(cachep, obj, slab_base);
 }
 
 void slab_info()
