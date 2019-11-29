@@ -3,8 +3,8 @@
 
 #include "header.hpp"
 
-void* memory;
-int64_t *page_info;
+extern void *memory;
+extern int64_t *page_info;
 
 void* create_memory(int64_t size);
 

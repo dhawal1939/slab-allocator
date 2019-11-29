@@ -14,7 +14,7 @@
 
 #define slab_list unordered_set<slab_s*>
 
-unordered_map<void*, void*> slab_to_cache_address;
+extern unordered_map<void*, void*> slab_to_cache_address;
 
 typedef struct kmem_cache_s
 {
@@ -63,7 +63,7 @@ struct cache_size_s
 	kmem_cache_s *cachep;
 };
 
-void* base_address;
+extern void* base_address;
 
 void kmem_cache_create(void *);
 
