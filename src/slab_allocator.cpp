@@ -301,7 +301,7 @@ void kmem_cache_free(kmem_cache_t* cachep, void *objp, void* slab_base)
         slab_data->num_active--;
         cachep->active_objs = --cachep->ref_count;
 
-        if(slab_data->slab_type == FULL)
+        if(slab_data->slab_type == FULL && slab_data->num_active != 0)
         {
             slab_data->slab_type = PARTIAL;
             
@@ -310,6 +310,21 @@ void kmem_cache_free(kmem_cache_t* cachep, void *objp, void* slab_base)
 
             full_list->erase(full_list->find(slab_data));
             partial_list->insert(slab_data); 
+        }
+        else if(slab_data->slab_type == FULL && slab_data->num_active == 0)
+        {
+        	slab_data->slab_type = FREE;
+
+        	slab_list* full_list = (slab_list*)cachep->full_lst;
+			slab_list* free_list = (slab_list*)cachep->free_lst;
+
+			full_list->erase(full_list->find(slab_data));
+			free_list->insert(slab_data);
+
+			if(free_list->size() > 2)
+			{
+				//REAP;
+			}
         }
         else if(slab_data->slab_type == PARTIAL && slab_data->num_active==0)
         {
