@@ -29,7 +29,9 @@ void* get_page()
     return memory+PAGE_SIZE*empty_page;
 }
 
-void* free_page()
+void* free_page(int64_t page_number)
 {
+	memset(memory + PAGE_SIZE * page_number, 0, PAGE_SIZE);
+	page_info[page_number] = 0;
     return NULL;
 }

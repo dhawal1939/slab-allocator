@@ -329,6 +329,7 @@ void kmem_cache_free(kmem_cache_t* cachep, void *objp, void* slab_base)
 				slab_s* delete_slab = *(free_list->begin());
 				free_list->erase(free_list->begin());
 				cachep->num_of_slabs--;
+				free_page(((int64_t)base_address - (int64_t)slab_base)/PAGE_SIZE);
 			}
         }
         else if(slab_data->slab_type == PARTIAL && slab_data->num_active==0)
