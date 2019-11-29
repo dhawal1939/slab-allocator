@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include "slab_allocator.hpp"
 
 int main()

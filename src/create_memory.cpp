@@ -1,5 +1,8 @@
 #include "create_memory.hpp"
 
+void *memory = NULL;
+int64_t *page_info =  NULL;
+
 void *create_memory(int64_t size)
 {
     int fd = open("/dev/zero", O_RDWR);

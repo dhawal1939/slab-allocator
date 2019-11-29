@@ -1,5 +1,6 @@
 #include "slab_allocator.hpp"
-
+unordered_map<void*, void*> slab_to_cache_address;
+void * base_address = NULL;
 void bufctl_init(uint64_t* bufctl)
 {
     memset(bufctl, 0, 16);

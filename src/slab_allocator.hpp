@@ -2,7 +2,6 @@
 #define SLAB_ALLOCATOR_H_
 #define slab_bufctl(slabp) \((kmem_bufctl_t *)(((slab_t*)slabp)+1))
 
-#include "header.hpp"
 #include "create_memory.hpp"
 
 // typedef struct slab_s;
@@ -14,7 +13,7 @@
 
 #define slab_list unordered_set<slab_s*>
 
-extern unordered_map<void*, void*> slab_to_cache_address;
+// extern unordered_map<void*, void*> slab_to_cache_address;
 
 typedef struct kmem_cache_s
 {
@@ -63,29 +62,29 @@ struct cache_size_s
 	kmem_cache_s *cachep;
 };
 
-extern void* base_address;
+// extern void* base_address;
 
-void kmem_cache_create(void *);
+extern void kmem_cache_create(void *);
 
-void kmem_init(void* basememory);
+extern void kmem_init(void* basememory);
 
-void* kmem_cache_alloc(kmem_cache_t*);
+extern void* kmem_cache_alloc(kmem_cache_t*);
 
-int64_t kmem_cache_reap(int64_t);
+extern int64_t kmem_cache_reap(int64_t);
 
-void kmem_cache_grow(kmem_cache_t*);
+extern void kmem_cache_grow(kmem_cache_t*);
 
-int64_t kmem_cache_shrink(kmem_cache_t*);
+extern int64_t kmem_cache_shrink(kmem_cache_t*);
 
-void kmem_cache_free(kmem_cache_t*, void*, void*);
+extern void kmem_cache_free(kmem_cache_t*, void*, void*);
 
-int64_t kmem_cache_destroy(kmem_cache_t*);
+extern int64_t kmem_cache_destroy(kmem_cache_t*);
 
-void *kmalloc(int64_t size);
+extern void *kmalloc(int64_t size);
 
-void kfree(void *addr);
+extern void kfree(void *addr);
 
-void slab_info();
+extern void slab_info();
 
 /*
 * kmem_caches implemented

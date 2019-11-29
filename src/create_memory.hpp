@@ -3,13 +3,11 @@
 
 #include "header.hpp"
 
-extern void *memory;
-extern int64_t *page_info;
 
-void* create_memory(int64_t size);
+extern void* create_memory(int64_t size);
 
-void* get_page();
+extern void* get_page();
 
-void* free_page();
+extern void* free_page();
 
 #endif //!CREATE_MEMORT_HPP_
