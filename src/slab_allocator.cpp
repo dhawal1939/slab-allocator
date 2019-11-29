@@ -17,20 +17,20 @@ uint64_t bufctl_first_free(uint64_t *buffctl, uint64_t max_objects)
 	return (i <= max_objects) ? i : -1; 
 }
 
-void bufctl_set(uint64_t *buffctl,uint64_t x)
+void bufctl_set(uint64_t *buffctl,uint64_t index)
 {
-	int64_t i=16*BITS-x;
+	int64_t i=16*BITS-index;
 
 	buffctl[i/BITS]|=(1<<(i%BITS));
 }
 
-void bufctl_clear(uint64_t *buffctl,uint64_t x)
+void bufctl_clear(uint64_t *buffctl,uint64_t index)
 {
 	// coming from MSB
-	int64_t i=16*BITS-x;
+	int64_t i = 16* BITS - index;
 
 	// array index and bit position
-	buffctl[(i/BITS)]&=(~(1<<(i%BITS)));                    
+	buffctl[(i/BITS)] &= (~(1<<(i%BITS)));                    
 }
 
 void kmem_cache_create(void *memory)
@@ -192,6 +192,7 @@ kmem_cache_t* kmem_cache_estimate(int64_t size)
 
 void* kmem_cache_alloc(kmem_cache_t *cachep)
 {
+    void* allocated = NULL;
     if(cachep)
     {
         int64_t obj_size = cachep->obj_size;
@@ -218,20 +219,34 @@ void* kmem_cache_alloc(kmem_cache_t *cachep)
         {
             free_partial_slab = *(partialist->begin());
         }
+
+        // first free object based on bufctl bitvector
+        uint64_t index = bufctl_first_free(free_partial_slab->bufctl, free_partial_slab->max_objects);
         
-        int index = 0;
-        // depends of buffctl
-        // we the index the bufctl calculate address
-        // update the slab from freelist fulllist
-        // index = get from bufctl
+        bufctl_set(free_partial_slab->bufctl, index);
+        
+        index--;
+
+        free_partial_slab->num_active++;
+
+        // Allocated address starts from start_addr + index * object size
+        
+        allocated = (free_partial_slab->start_adrr + index * obj_size);
+        
+        if(free_partial_slab->num_active >= free_partial_slab->max_objects)
         {
-            free_partial_slab->num_active++;
-            //update the partial based on the number of active objects and max count
-            free_partial_slab->free_adr //not using think about
-            allocated = (free_partial_slab->start_adrr + index * obj_size);
+            partialist->erase(partialist->find(free_partial_slab));
+
+            fulllist->insert(free_partial_slab);
+            free_partial_slab->slab_type = FULL;
         }
 
     }
+    else
+    {
+        printf("CACHEP NOT ALLOCATED\n");
+    }
+    return allocated;
 }
 
 
