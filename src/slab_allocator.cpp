@@ -28,7 +28,7 @@ void bufctl_set(uint64_t *buffctl,uint64_t index)
 void bufctl_clear(uint64_t *buffctl,uint64_t index)
 {
 	// coming from MSB
-	int64_t i = 8* BITS - index;
+	int64_t i = 8 * BITS - index;
 
 	uint64_t shift = 1;
 	// array index and bit position
@@ -155,7 +155,7 @@ void kmem_cache_grow(kmem_cache_t *cachep)
 
         cachep->num_of_slabs++;
 
-        slab_s *slab_data = (slab_s*)(new_slab + PAGE_SIZE - sizeof(slab_data));
+        slab_s *slab_data = (slab_s*)(new_slab + PAGE_SIZE - sizeof(slab_s));
 
         slab_data->max_objects = cachep->max_objs_per_slab;
 
@@ -271,9 +271,10 @@ void * kmalloc(int64_t size)
     if(base_address)
     {
         kmem_cache_t* cachep = kmem_cache_estimate(size);
-        cachep->active_objs = ++cachep->ref_count;
 
         allocated = kmem_cache_alloc(cachep);
+
+        cachep->active_objs = ++cachep->ref_count;
     }
     else
     {
@@ -288,15 +289,13 @@ void kmem_cache_free(kmem_cache_t* cachep, void *objp, void* slab_base)
 {
     if(cachep && objp && slab_base)
     {
-        slab_s* slab_data;
 
-
-        slab_data = (slab_s*)(slab_base + PAGE_SIZE - sizeof(slab_s));
+        slab_s* slab_data = (slab_s*)(slab_base + PAGE_SIZE - sizeof(slab_s));
 
         int64_t obj_size,obj_indx;
         obj_size = cachep->obj_size;
         obj_indx = (((int64_t)objp - (int64_t)slab_data->start_adrr)/obj_size);
-        
+
         bufctl_clear(slab_data->bufctl, obj_indx+1);
 
         slab_data->num_active--;
@@ -343,19 +342,14 @@ void kfree(void* obj){
         printf("NULL MEMORY PASSED\n");
         return;
     }
-    //void *rel_slabaddr=NULL;
+
     void *slab_base=NULL;
 
     int64_t addr =  ((int64_t)obj - (int64_t)base_address)/PAGE_SIZE;
 
     slab_base = base_address + PAGE_SIZE*addr;
     
-    for(auto i = slab_to_cache_address.begin(); i != slab_to_cache_address.end(); i++)
-    	printf("%ld->%ld\n", i->first, i->second);
-
     kmem_cache_t *cachep=NULL;
-
-    printf("%ld\n", slab_base);
 
     // taking absolute address as key
     cachep = (kmem_cache_t*)slab_to_cache_address[(int64_t)slab_base];
