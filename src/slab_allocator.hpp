@@ -62,29 +62,30 @@ struct cache_size_s
 	kmem_cache_s *cachep;
 };
 
-// extern void* base_address;
-
-extern void kmem_cache_create(void *);
 
 extern void kmem_init(void* basememory);
-
-extern void* kmem_cache_alloc(kmem_cache_t*);
-
-extern int64_t kmem_cache_reap(int64_t);
-
-extern void kmem_cache_grow(kmem_cache_t*);
-
-extern int64_t kmem_cache_shrink(kmem_cache_t*);
-
-extern void kmem_cache_free(kmem_cache_t*, void*, void*);
-
-extern int64_t kmem_cache_destroy(kmem_cache_t*);
 
 extern void *kmalloc(int64_t size);
 
 extern void kfree(void *addr);
 
 extern void slab_info();
+
+/*
+ *
+ * // extern void* kmem_cache_alloc(kmem_cache_t*);
+ *
+ * // extern void kmem_cache_grow(kmem_cache_t*);
+ *
+ * // extern int64_t kmem_cache_shrink(kmem_cache_t*);
+ *
+ * // extern void kmem_cache_free(kmem_cache_t*, void*, void*);
+ *
+ * // extern void* base_address;
+ *
+ * // extern void kmem_cache_create(void *);
+ *
+ */
 
 /*
 * kmem_caches implemented

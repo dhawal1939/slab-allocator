@@ -43,7 +43,7 @@ void kmem_cache_create(void *memory)
     {
         kmem_cs[i].obj_size = pow(2,i+3);
 
-        sprintf(kmem_cs[i].name, "%s-%ld", "kmem_cache_size", kmem_cs[i].obj_size);
+        sprintf(kmem_cs[i].name, "%s-%ld", "size", kmem_cs[i].obj_size);
         
         kmem_cs[i].ctor = kmem_cs[i].dtor = NULL;
        
@@ -86,6 +86,8 @@ void* kmem_init_helper(){
     cache_cache->ctor = cache_cache->dtor = NULL;
 
     cache_cache->obj_size = sizeof(cache_size_s);
+
+    cache_cache->num_of_slabs = 1;
 
     cache_cache->max_objs_per_slab = NO_OF_CACHES;
     
@@ -135,18 +137,6 @@ int64_t calculate_color_offset(kmem_cache_t *cachep)
     return color_offset;
 }
 
-void kmem_init(void* basememory)
-{
-    base_address = basememory;
-	kmem_cache_t* first_cache = (kmem_cache_t*)kmem_init_helper();
-	kmem_cache_t* temp_cache = first_cache;
-	for(int i = 0; i < NO_OF_CACHES; i++)
-    {
-		kmem_cache_grow(temp_cache);
-        temp_cache++;
-	}
-}
-
 void kmem_cache_grow(kmem_cache_t *cachep)
 {
     if(cachep)
@@ -175,6 +165,18 @@ void kmem_cache_grow(kmem_cache_t *cachep)
         ((slab_list*)cachep->free_lst)->insert(slab_data);        
     }
     return;
+}
+
+void kmem_init(void* basememory)
+{
+    base_address = basememory;
+	kmem_cache_t* first_cache = (kmem_cache_t*)kmem_init_helper();
+	kmem_cache_t* temp_cache = first_cache;
+	for(int i = 0; i < NO_OF_CACHES; i++)
+    {
+		kmem_cache_grow(temp_cache);
+        temp_cache++;
+	}
 }
 
 kmem_cache_t* kmem_cache_estimate(int64_t size)
@@ -323,7 +325,10 @@ void kmem_cache_free(kmem_cache_t* cachep, void *objp, void* slab_base)
 
 			if(free_list->size() > 2)
 			{
-				//REAP;
+				//REAPING WHEN CONDITION IS SATISFIED;
+				slab_s* delete_slab = *(free_list->begin());
+				free_list->erase(free_list->begin());
+				cachep->num_of_slabs--;
 			}
         }
         else if(slab_data->slab_type == PARTIAL && slab_data->num_active==0)
