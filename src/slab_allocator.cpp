@@ -269,37 +269,76 @@ void * kmalloc(int64_t size)
 
 
 
-void kmem_cache_free(void *objp){
-    slab_s* slab;
-    void *rel_slabaddr=NULL;
-    void *abs_slabaddr=NULL;
-    void *cache_addr=NULL;
-    kmem_cache_t* cache;
-    int64_t obj_size,obj_indx;
+void kmem_cache_free(kmem_cache_t* cachep, void *objp, void* slab_base)
+{
+    if(cachep && objp && slab_base)
+    {
+        slab_s* slab_data;
 
-    rel_slabaddr = (void *)(((long)objp >>12)<<12);
 
-    abs_slabaddr = base_address +(long)rel_slabaddr ;
-    slab = (slab_s*)abs_slabaddr;
+        slab_data = (slab_s*)(slab_base + PAGE_SIZE - sizeof(slab_s));
 
-    cache_addr = slab_to_cache_address[abs_slabaddr]; //taking absolute address as key
+        int64_t obj_size,obj_indx;
+        obj_size = cachep->obj_size;
+        obj_indx = (((int64_t)objp - (int64_t)slab_data->start_adrr)/obj_size);
+        
+        bufctl_clear(slab_data->bufctl, obj_indx+1);
 
-    obj_size = ((kmem_cache_t*)cache_addr)->obj_size;
+        slab_data->num_active--;
+        cachep->active_objs = --cachep->ref_count;
 
-    obj_indx = ((int64_t)objp - (int64_t)abs_slabaddr)/obj_size;
-    
-    bufctl_clear(slab->bufctl,obj_indx+1);
+        if(slab_data->slab_type == FULL)
+        {
+            slab_data->slab_type = PARTIAL;
+            
+            slab_list* full_list = (slab_list*)cachep->full_lst;
+            slab_list* partial_list = (slab_list*)cachep->partial_lst;
 
-    cache = (kmem_cache_t*)cache_addr;
-    slab->num_active--;
-    cache->ref_count--;
-    cache->active_objs--;
+            full_list->erase(full_list->find(slab_data));
+            partial_list->insert(slab_data); 
+        }
+        else if(slab_data->slab_type == PARTIAL && slab_data->num_active==0)
+        {
+            slab_data->slab_type = FREE;
 
-    if(slab->num_active==0){
-        slab->slab_type = FREE;
-         void* temp = (void*)(long(abs_slabaddr)<<12 - sizeof(slab_s));
-        ((slab_list*)(cache->partial_lst))->erase((slab_s*)temp);
-        ((slab_list*) (cache->free_lst))->insert((slab_s*)temp);
+            slab_list* partial_list = (slab_list*)cachep->partial_lst;
+            slab_list* free_list = (slab_list*)cachep->free_lst;
+
+            partial_list->erase(partial_list->find(slab_data));
+            free_list->insert(slab_data);
+
+            // STUB for REAP IF slab_FREE is more than 2 size
+        }
+        else
+        {
+            printf("SOME ERROR IN KMEM PARTIAL TO FREE / FULL TO PARTIAL\n");
+        }
     }
+    else
+    {
+        printf("ERROR IN KMEME CACHE FREE\n");
+    }
+    
+    return ;
+}
 
-} 
+void kfree(void* obj){
+    if(!obj) 
+    {
+        printf("NULL MEMORY PASSED\n");
+        return;
+    }
+    void *rel_slabaddr=NULL;
+    void *slab_base=NULL;
+
+    int64_t addr = (int64_t)obj;
+    rel_slabaddr = (void *)((addr >>12)<<12);
+
+    slab_base = base_address +(long)rel_slabaddr ;
+    
+    void *cachep=NULL;
+    // taking absolute address as key
+    cachep = slab_to_cache_address[slab_base];
+   
+    kmem_cache_free((kmem_cache_t*)cachep, obj, slab_base);
+}

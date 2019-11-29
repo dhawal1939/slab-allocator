@@ -76,14 +76,13 @@ void kmem_cache_grow(kmem_cache_t*);
 
 int64_t kmem_cache_shrink(kmem_cache_t*);
 
-void* kmem_cache_free(kmem_cache_t*, void*);
+void kmem_cache_free(kmem_cache_t*, void*, void*);
 
 int64_t kmem_cache_destroy(kmem_cache_t*);
 
 void *kmalloc(int64_t size);
 
 void kfree(void *addr);
-
 /*
 * kmem_caches implemented
 * 4, 8, 16,32,64,128,256,512,1K, 2k,4k(max-page size)
