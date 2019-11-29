@@ -11,7 +11,7 @@ void *create_memory(int64_t size, int64_t* page_info )
     return memory;
 }
 
-void * get_page()
+void* get_page()
 {
     int64_t empty_page = 0;
     int64_t *traverse = page_info;

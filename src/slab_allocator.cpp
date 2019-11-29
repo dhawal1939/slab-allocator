@@ -1,5 +1,38 @@
 #include "slab_allocator.hpp"
 
+void bufctl_init(uint64_t* bufctl)
+{
+    memset(bufctl, 0, 16);
+    return;
+}
+
+uint64_t bufctl_first_free(uint64_t *buffctl, uint64_t max_objects)
+{
+	int64_t i=15;
+    	
+	while(~buffctl[i] == 0)i--;
+    
+    i = BITS - log2(~buffctl[i]) + (15 - i) * BITS + 1;
+
+	return (i <= max_objects) ? i : -1; 
+}
+
+void bufctl_set(uint64_t *buffctl,uint64_t x)
+{
+	int64_t i=16*BITS-x;
+
+	buffctl[i/BITS]|=(1<<(i%BITS));
+}
+
+void bufctl_clear(uint64_t *buffctl,uint64_t x)
+{
+	// coming from MSB
+	int64_t i=16*BITS-x;
+
+	// array index and bit position
+	buffctl[(i/BITS)]&=(~(1<<(i%BITS)));                    
+}
+
 void kmem_cache_create(void *memory)
 {
     kmem_cache_t * kmem_cs = (kmem_cache_s*)memory;
@@ -128,6 +161,8 @@ void kmem_cache_grow(kmem_cache_t *cachep)
 
         slab_data->free_adr = 0;
 
+        bufctl_init(slab_data->bufctl);
+
        //hash needs to be made so as to use it at delete
         slab_to_cache_address[new_slab] = cachep;
     
@@ -155,13 +190,10 @@ kmem_cache_t* kmem_cache_estimate(int64_t size)
 * 
 */
 
-void *kmalloc(int64_t size)
+void* kmem_cache_alloc(kmem_cache_t *cachep)
 {
-    void *allocated = NULL;
-    if(base_address)
+    if(cachep)
     {
-        kmem_cache_t* cachep = kmem_cache_estimate(size);
-
         int64_t obj_size = cachep->obj_size;
         
         slab_list  *partialist, *freelist, *fulllist;
@@ -170,19 +202,48 @@ void *kmalloc(int64_t size)
         fulllist = ((slab_list*)(cachep->full_lst));
         freelist = ((slab_list*)(cachep->free_lst));
 
-        slab_s* free_slab = NULL;
+        slab_s* free_partial_slab = NULL;
+
+        if(partialist->size()==0 && freelist->size()==0)
+        {
+            kmem_cache_grow(cachep);
+            free_partial_slab = *(freelist->begin());
+            freelist->erase(freelist->begin());
+
+            free_partial_slab->slab_type = PARTIAL;
+            partialist->insert(free_partial_slab);
+
+        }
+        else if(partialist->size() != 0)
+        {
+            free_partial_slab = *(partialist->begin());
+        }
+        
         int index = 0;
         // depends of buffctl
         // we the index the bufctl calculate address
         // update the slab from freelist fulllist
         // index = get from bufctl
         {
-            free_slab->num_active++;
+            free_partial_slab->num_active++;
             //update the partial based on the number of active objects and max count
-            free_slab->slab_type = PARTIAL;
-            free_slab->free_adr //not using think about
-            allocated = (free_slab->start_adrr + index * obj_size);
+            free_partial_slab->free_adr //not using think about
+            allocated = (free_partial_slab->start_adrr + index * obj_size);
         }
+
+    }
+}
+
+
+
+void * kmalloc(int64_t size)
+{
+    void *allocated = NULL;
+    if(base_address)
+    {
+        kmem_cache_t* cachep = kmem_cache_estimate(size);
+
+        allocated = kmem_cache_alloc(cachep);
     }
     else
     {

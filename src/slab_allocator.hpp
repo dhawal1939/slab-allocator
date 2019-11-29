@@ -68,7 +68,7 @@ void* base_address;
 
 void kmem_cache_create(void *);
 
-void kmem_cache_alloc(kmem_cache_t*);
+void* kmem_cache_alloc(kmem_cache_t*);
 
 int64_t kmem_cache_reap(int64_t);
 
