@@ -12,6 +12,8 @@ typedef struct slab_s;
 #define PARTIAL 3
 #define MAX_SLAB_SIZE 200
 
+#define slab_list unordered_set<slab_s*>
+
 unordered_map<void*, void*> slab_to_cache_address;
 
 typedef struct kmem_cache_s
