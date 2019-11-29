@@ -6,7 +6,43 @@
 
 #IncludeRegexTransform: 
 
-/home/jondoe/os-project/slab-allocator/src/main.cpp
+/home/richa/Desktop/slab-allocator/src/create_memory.hpp
+header.hpp
+/home/richa/Desktop/slab-allocator/src/header.hpp
+
+/home/richa/Desktop/slab-allocator/src/header.hpp
+cstdio
+-
+cstdlib
+-
+cstdint
+-
+cmath
+-
+cstring
+-
+unordered_map
+-
+unordered_set
+-
+list
+-
+unistd.h
+-
+sys/mman.h
+-
+fcntl.h
+-
+
+/home/richa/Desktop/slab-allocator/src/main.cpp
 stdio.h
 -
+slab_allocator.hpp
+/home/richa/Desktop/slab-allocator/src/slab_allocator.hpp
+
+/home/richa/Desktop/slab-allocator/src/slab_allocator.hpp
+header.hpp
+/home/richa/Desktop/slab-allocator/src/header.hpp
+create_memory.hpp
+/home/richa/Desktop/slab-allocator/src/create_memory.hpp
 

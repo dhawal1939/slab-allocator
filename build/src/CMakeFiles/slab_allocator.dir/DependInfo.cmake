@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/home/jondoe/os-project/slab-allocator/src/main.cpp" "/home/jondoe/os-project/slab-allocator/build/src/CMakeFiles/slab_allocator.dir/main.o"
+  "/home/richa/Desktop/slab-allocator/src/main.cpp" "/home/richa/Desktop/slab-allocator/build/src/CMakeFiles/slab_allocator.dir/main.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 
