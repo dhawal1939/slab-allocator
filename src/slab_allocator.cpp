@@ -36,10 +36,11 @@ void bufctl_clear(uint64_t *buffctl,uint64_t index)
 
 void kmem_cache_create(void *memory)
 {
-    kmem_cache_t * kmem_cs = (kmem_cache_s*)memory;
-    for(int i=3;i<NO_OF_CACHES+3;i++)
+//    kmem_cache_t *kmem_cs = (kmem_cache_t*)(base_address + sizeof(kmem_cache_t));
+	kmem_cache_t *kmem_cs = (kmem_cache_t*)memory;
+    for(int i=0;i<NO_OF_CACHES;i++)
     {
-        kmem_cs[i].obj_size = pow(2,i);
+        kmem_cs[i].obj_size = pow(2,i+3);
 
         sprintf(kmem_cs[i].name, "%s-%ld", "size", kmem_cs[i].obj_size);
         
@@ -104,16 +105,17 @@ void* kmem_init_helper(){
     (*(slab_list*)(cache_cache->partial_lst)).insert(cache_slab_s);
     
     // hard Coded we can modify if time permits
-    kmem_cache_t* kmem_cs = (kmem_cache_t*)((kmem_cache_t*)cache_cache+1);
+    kmem_cache_t* kmem_cs = (kmem_cache_t*)(base_address + sizeof(kmem_cache_t));
 
-    cache_size_s* cache_slab = (cache_size_s*)(base_address+PAGE_SIZE);
+    cache_size_s* cache_slab = (cache_size_s*)(base_address + PAGE_SIZE);
 
     kmem_cache_create(kmem_cs);
+    kmem_cs = (kmem_cache_t*)(base_address + sizeof(kmem_cache_t));
 
     for(int i=0;i<NO_OF_CACHES;i++)
     {
         cache_slab[i].cache_size = pow(2,i+3);
-        cache_slab[i].cachep = &kmem_cs[i+3];
+        cache_slab[i].cachep = (kmem_cache_t*)(base_address + sizeof(kmem_cache_t)*(i+1));
     }
     return kmem_cs; 
 }
