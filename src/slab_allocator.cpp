@@ -40,7 +40,7 @@ void kmem_cache_create(void *memory)
     {
         kmem_cs[i].obj_size = pow(2,i);
 
-        sprintf(kmem_cs[i].name, "%s-%d\0", "size", kmem_cs[i].obj_size);
+        sprintf(kmem_cs[i].name, "%s-%ld", "size", kmem_cs[i].obj_size);
         
         kmem_cs[i].ctor = kmem_cs[i].dtor = NULL;
        
@@ -73,7 +73,7 @@ void* kmem_init_helper(){
 
     kmem_cache_t* cache_cache = (kmem_cache_t*)get_page();
     
-    sprintf(cache_cache->name,"kmem-cache\0");
+    sprintf(cache_cache->name,"kmem-cache");
     
     // Calculate slab_data from page start 
     cache_cache->partial_lst = (void*)new slab_list();
@@ -102,7 +102,7 @@ void* kmem_init_helper(){
     
     (*(slab_list*)(cache_cache->partial_lst)).insert(cache_slab_s);
     
-    //hardcoded we can modify if time permits
+    // hard Coded we can modify if time permits
     kmem_cache_t* kmem_cs = (kmem_cache_t*)((kmem_cache_t*)cache_cache+1);
 
     cache_size_s* cache_slab = (cache_size_s*)(base_address+PAGE_SIZE);
@@ -163,7 +163,7 @@ void kmem_cache_grow(kmem_cache_t *cachep)
 
         bufctl_init(slab_data->bufctl);
 
-       //hash needs to be made so as to use it at delete
+        // hash needs to be made so as to use it at delete
         slab_to_cache_address[new_slab] = cachep;
     
         ((slab_list*)cachep->free_lst)->insert(slab_data);        
@@ -341,4 +341,23 @@ void kfree(void* obj){
     cachep = slab_to_cache_address[slab_base];
    
     kmem_cache_free((kmem_cache_t*)cachep, obj, slab_base);
+}
+
+void slab_info()
+{
+    kmem_cache_t* cachep = (kmem_cache_t*)base_address;
+
+    printf("NAME\t\tOBJ_SIZE\t\tMAX_OBJ_SLAB\t\tREF_COUNT\t\tNUM_OF_SLABS\t\tFREE_LIST SIZE\t\tPARTIAL_LIST SIZE\t\tPARTIAL_LIST SIZE\n\n");
+    for(int i = 0; i < NO_OF_CACHES + 1; i++)
+    {
+        printf("%s\t", cachep[i].name);
+        printf("%ld\t", cachep[i].obj_size);
+        printf("%ld\t", cachep[i].max_objs_per_slab);
+        printf("%ld\t", cachep[i].ref_count);
+        printf("%ld\t", cachep[i].num_of_slabs);
+        printf("%ld\t", ((slab_list*)(cachep[i].free_lst))->size());
+        printf("%ld\t", ((slab_list*)(cachep[i].full_lst))->size());
+        printf("%ld\n", ((slab_list*)(cachep[i].partial_lst))->size());
+    }
+    return;
 }

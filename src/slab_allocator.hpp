@@ -5,7 +5,7 @@
 #include "header.hpp"
 #include "create_memory.hpp"
 
-typedef struct slab_s;
+// typedef struct slab_s;
 
 #define FULL 1
 #define FREE 2
@@ -55,7 +55,6 @@ struct slab_s{
 
    kmem_bufctl_t free_adr;
    uint64_t bufctl[16];
-
 };
 
 struct cache_size_s
@@ -67,6 +66,8 @@ struct cache_size_s
 void* base_address;
 
 void kmem_cache_create(void *);
+
+void kmem_init(void* basememory);
 
 void* kmem_cache_alloc(kmem_cache_t*);
 
@@ -83,6 +84,9 @@ int64_t kmem_cache_destroy(kmem_cache_t*);
 void *kmalloc(int64_t size);
 
 void kfree(void *addr);
+
+void slab_info();
+
 /*
 * kmem_caches implemented
 * 4, 8, 16,32,64,128,256,512,1K, 2k,4k(max-page size)
