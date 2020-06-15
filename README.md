@@ -7,7 +7,7 @@ Implementation is Based on Jeff Bonwick's paper on Slab-Allocator
 
 How To Run 
 
-    $git clone repo-link
+    $git clone https://github.com/thesigmaguy/slab-allocator.git
 
     $cd slab-allocator/build
 
